@@ -4,20 +4,16 @@
 green="\e[38;5;87m"
 red="\e[38;5;196m"
 neutral="\e[0m"
-blue="\e[38;5;130m"
-orange="\e[38;5;99m"
 yellow="\e[38;5;226m"
-bold_white="\e[1;37m"
 reset="\e[0m"
 
 # ========== Remove Previous Bot ==========
 hapus_bot_lama() {
-  echo -e "${orange}Menghapus bot lama...${neutral}"
+  echo -e "${yellow}Menghapus bot lama...${neutral}"
   systemctl stop sellvpn.service 2>/dev/null
   systemctl disable sellvpn.service 2>/dev/null
   rm -f /etc/systemd/system/sellvpn.service
-  rm -f /usr/bin/sellvpn /usr/bin/server_sellvpn /etc/cron.d/server_sellvpn
-  rm -rf /root/BotV2
+  rm -rf /root/BotVPN2
 
   if command -v pm2 &> /dev/null; then
     pm2 delete sellvpn &> /dev/null
@@ -30,10 +26,9 @@ hapus_bot_lama() {
 
 # ========== Install Dependencies ==========
 pasang_package() {
-  echo -e "${blue}Install dependensi...${reset}"
-
+  echo -e "${yellow}Install dependensi...${reset}"
   apt update -y
-  apt install -y npm nodejs curl dos2unix jq tmux git \
+  apt install -y nodejs npm git curl dos2unix jq ufw \
     build-essential libcairo2-dev libpango1.0-dev libjpeg-dev \
     libgif-dev librsvg2-dev pkg-config libpixman-1-dev
 
@@ -44,24 +39,21 @@ pasang_package() {
 setup_bot() {
   timedatectl set-timezone Asia/Jakarta
 
-  if [ -d /root/BotV2/.git ]; then
-    echo -e "${yellow}Update dari Git...${reset}"
-    cd /root/BotVPN2 && git pull
-  else
-    echo -e "${green}Clone repo bot...${reset}"
-    git clone https://github.com/mudziboy/mdzitr/BhotVpn-main/app.js
-  fi
+  echo -e "${yellow}Clone repo bot...${reset}"
+  git clone https://github.com/mudziboy/mdzitr.git /root/BotVPN2
 
-  echo -e "${yellow}Convert semua script ke format Unix (LF)...${reset}"
-  find /root/BotV2/scripts -type f -name "*.sh" -exec dos2unix {} \;
+  # pindah ke folder BhotVpn-main lalu ambil semua file ke /root/BotVPN2
+  cp -r /root/BotVPN2/BhotVpn-main/* /root/BotVPN2/
+  rm -rf /root/BotVPN2/BhotVpn-main
 
   echo -e "${yellow}Install NPM packages...${reset}"
-  npm install --prefix /root/BotV2 sqlite3 express crypto telegraf axios dotenv node-cron
+  cd /root/BotVPN2
+  npm install sqlite3 express crypto telegraf axios dotenv node-cron winston
 
-  chmod +x /root/BotV2/*
+  chmod +x /root/BotVPN2/*
 }
 
-# ========== Konfigurasi Firewalld/UFW ==========
+# ========== Firewall ==========
 set_firewall() {
   echo -e "${yellow}Mengaktifkan firewall...${reset}"
   ufw allow 22
@@ -74,9 +66,7 @@ set_firewall() {
 # ========== Konfigurasi Bot ==========
 server_app() {
   clear
-  echo -e "${orange}──────────────────────────────────────────────${neutral}"
-  echo -e "   ${green}::: KONFIGURASI BOT VPN TELEGRAM :::${neutral}"
-  echo -e "${orange}──────────────────────────────────────────────${neutral}"
+  echo -e "${yellow}::: KONFIGURASI BOT VPN TELEGRAM :::${neutral}"
 
   read -p "Masukkan Token Bot      : " token
   read -p "Masukkan Admin ID       : " adminid
@@ -99,29 +89,11 @@ server_app() {
 }
 EOF
 
-  if ! jq empty /root/BotVPN2/.vars.json 2>/dev/null; then
-    echo -e "${red}❌ Gagal membuat file .vars.json. Cek input atau format.${neutral}"
-    exit 1
-  fi
-
-  cat >/etc/cron.d/server_sellvpn <<EOF
-SHELL=/bin/sh
-PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
-*/30 * * * * root curl -s -F chat_id="$adminid" -F document=@"/root/BotV2/sellvpn.db" "https://api.telegram.org/bot$token/sendDocument" >/dev/null 2>&1
-EOF
-
-
-  # 🚀 Start PM2 bot
-    
-  sleep 2
-  pm2 start app.js --name sellvpn --cwd /root/BotV2 --log /var/log/sellvpn.log
+  echo -e "${yellow}Menjalankan bot dengan PM2...${neutral}"
+  cd /root/BotVPN2
+  pm2 start app.js --name sellvpn --log /var/log/sellvpn.log
   pm2 save
   pm2 startup
-
-  # 📩 Notifikasi awal ke Admin
-  curl -s -X POST https://api.telegram.org/bot$token/sendMessage \
-    -d chat_id="$adminid" \
-    -d text="✅ Bot VPN berhasil diaktifkan!\nGunakan /start untuk mulai."
 
   echo -e "${green}Bot VPN telah aktif. Cek Telegram!${neutral}"
 }
@@ -134,8 +106,6 @@ if [[ ${1} == "sellvpn" ]]; then
   set_firewall
   server_app
 else
-  echo -e "${red}Gunakan perintah: ${yellow}start sellvpn${neutral}"
+  echo -e "${red}Gunakan perintah: ${yellow}bash start2 sellvpn${neutral}"
   exit 1
-
 fi
-
