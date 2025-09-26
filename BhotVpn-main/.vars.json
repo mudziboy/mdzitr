@@ -1,0 +1,9 @@
+{
+  "BOT_TOKEN": "isi_token_bot",
+  "USER_ID": "isi_user_id",
+  "GROUP_ID": "isi_group_id",
+  "NAMA_STORE": "NamaTokoKamu",
+  "PORT": "50123",
+  "DATA_QRIS": "data_qris_kamu",
+  "MERCHANT_ID": "id_merchant_kamu"
+}
