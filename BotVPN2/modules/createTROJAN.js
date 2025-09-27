@@ -22,40 +22,21 @@ async function createtrojan(username, exp, quota, limitip, serverId) {
 
         const d = data.data;
 
-  // Pesan teks Trojan
-const messageTextTrojan = `
-🌟 *AKUN TROJAN PREMIUM* 🌟
+        const msg = `
+         🔥 *TROJAN PREMIUM ACCOUNT*
 
-┌───☠️───────────────☠️───┐
-│ *Username*  : \`${trojanData.username}\`
-│ *Domain*    : \`${trojanData.domain}\`
-│ *Port TLS*  : \`443\`
-│ *Port HTTP* : \`80\`
-│ *Security*  : \`Auto\`
-│ *Network*   : \`Websocket (WS)\`
-│ *Path*      : \`/trojan-ws\`
-│ *Path GRPC* : \`trojan-grpc\`
-└─────💀─────☠️────💀────┘
-
-⚙️ *Petunjuk Singkat*
-• Salin credential di atas dan pakai path \`/trojan-ws\` untuk WebSocket.
-• Untuk bantuan atau konfigurasi lanjut, klik tombol di bawah ini.
-`;
-
-// Inline button
-const replyMarkupTrojan = {
-  inline_keyboard: [
-    [
-      { text: "Hubungi Admin", url: "https://t.me/rahmarie" }
-    ]
-  ]
-};
-
-// Kirim pesan
-bot.sendMessage(chatId, messageTextTrojan, {
-  parse_mode: "Markdown",
-  reply_markup: replyMarkupTrojan
-});
+🔹 *Informasi Akun*
+┌─────────────────────
+│👤 *Username:* \`${d.username}\`
+│🌐 *Domain:* \`${d.domain}\`
+└─────────────────────
+┌─────────────────────
+│🔐 *Port TLS:* \`443\`
+│📡 *Port HTTP:* \`80\`
+│🔁 *Network:* WebSocket / gRPC
+│📦 *Quota:* ${d.quota}
+│🌍 *IP Limit:* ${d.ip_limit}
+└─────────────────────
 
 🔗 *TROJAN TLS:*
 \`\`\`
@@ -72,7 +53,7 @@ ${d.trojan_grpc_link}
 │
 │📥 [Save Account](https://${d.domain}:81/trojan-${d.username}.txt)
 └─────────────────────
-✨ By : *SAGI MARKET VVIP*! ✨
+✨ By : *EXTRIMER TUNNEL*! ✨
 `.trim();
 
         resolve(msg);

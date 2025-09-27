@@ -29,42 +29,21 @@ async function createvmess(username, exp, quota, limitip, serverId) {
 
         const d = data.data;
 
-        // Pesan teks
-const messageText = `
-🌟 *SAGI MARKET VMESS* 🌟
-
-┌───☠️───────────────☠️───┐
-│ *Username*   : \`${vmessData.username}\`
-│ *Domain*     : \`${vmessData.domain}\`
-│ *Port TLS*   : \`443\`
-│ *Port HTTP*  : \`80\`
-│ *Alter ID*   : \`0\`
-│ *Security*   : \`Auto\`
-│ *Network*    : \`Websocket (WS)\`
-│ *Path*       : \`/vmess\`
-│ *Path GRPC*  : \`vmess-grpc\`
-└─────💀─────☠️────💀────┘
-
-⚙️ *Petunjuk Singkat*
-• Salin \`vmess\` credential di atas.
-• Gunakan path \`/vmess\` untuk koneksi WebSocket.
-• Untuk bantuan, klik tombol di bawah ini.
-`;
-
-// Inline button
-const replyMarkup = {
-  inline_keyboard: [
-    [
-      { text: "Hubungi Admin", url: "https://t.me/rahmarie" }
-    ]
-  ]
-};
-
-// Contoh pengiriman pakai node-telegram-bot-api
-bot.sendMessage(chatId, messageText, {
-  parse_mode: "Markdown",
-  reply_markup: replyMarkup
-});
+        const msg = `
+         🔥 *VMESS PREMIUM ACCOUNT*
+         
+🔹 *Informasi Akun*
+┌─────────────────────
+│👤 *Username:* \`${d.username}\`
+│🌐 *Domain:* \`${d.domain}\`
+└─────────────────────
+┌─────────────────────
+│🔐 *Port TLS:* \`443\`
+│📡 *Port HTTP:* \`80\`
+│🔁 *Network:* WebSocket
+│📦 *Quota:* ${d.quota === '0 GB' ? 'Unlimited' : d.quota}
+│🌍 *IP Limit:* ${d.ip_limit === '0' ? 'Unlimited' : d.ip_limit}
+└─────────────────────
 
 🔗 *VMESS TLS:*
 \`\`\`
@@ -86,7 +65,7 @@ ${d.vmess_grpc_link}
 │
 │📥 [Save Account](https://${d.domain}:81/vmess-${d.username}.txt)
 └─────────────────────
-✨ By : *SAGI MARKET VVIP*! ✨
+✨ By : *EXTRIMER TUNNEL*! ✨
 `.trim();
 
         console.log('✅ VMESS created for', username);

@@ -22,52 +22,25 @@ async function createssh(username, password, exp, iplimit, serverId) {
 
         const d = data.data;
 
-     // Pesan teks
-const messageText = `
-🌟 *AKUN SSH PREMIUM* 🌟
+        const msg = `
+        🔥 *AKUN SSH PREMIUM* 
 
-┌───☠️───────────────☠️───┐
-│ *Username*  : \`${sshData.username}\`
-│ *Password*  : \`${sshData.password}\`
-└─────💀─────☠️────💀────┘
-
-┌───☠️───────────────☠️───┐
-│ *Domain*      : \`${sshData.domain}\`
-│ *Port TLS*    : \`443\`
-│ *Port HTTP*   : \`80\`
-│ *OpenSSH*     : \`22\`
-│ *UdpSSH*      : \`1-65535\`
-│ *DNS*         : \`443, 53, 22\`
-│ *Dropbear*    : \`443, 109\`
-│ *SSH WS*      : \`80\`
-│ *SSH SSL WS*  : \`443\`
-│ *SSL/TLS*     : \`443\`
-│ *OVPN SSL*    : \`443\`
-│ *OVPN TCP*    : \`1194\`
-│ *OVPN UDP*    : \`2200\`
-│ *BadVPN UDP*  : \`7100, 7300, 7300\`
-└─────💀─────☠️────💀────┘
-
-⚙️ *Petunjuk Singkat*
-• Salin credential (username & password) di atas.
-• Gunakan port sesuai baris layanan (mis. OpenSSH → 22).
-• Untuk bantuan atau konfigurasi, klik tombol di bawah ini.
-`;
-
-// Inline button
-const replyMarkup = {
-  inline_keyboard: [
-    [
-      { text: "Hubungi Admin", url: "https://t.me/rahmarie" }
-    ]
-  ]
-};
-
-// Contoh pengiriman pakai node-telegram-bot-api
-bot.sendMessage(chatId, messageText, {
-  parse_mode: "Markdown",
-  reply_markup: replyMarkup
-});
+🔹 *Informasi Akun*
+┌─────────────────────
+│👤 Username   : \`${d.username}\`
+│🔑 Password   : \`${d.password}\`
+│🌐 Domain     : \`${d.domain}\`
+└─────────────────────
+┌─────────────────────
+│🔒 TLS        : 443
+│🌍 HTTP       : 80
+│🛡️ SSH        : 22
+│🌐 SSH WS     : 80
+│🔐 SSL WS     : 443
+│🧱 Dropbear   : 109, 443
+│🧭 DNS        : 53, 443, 22
+│📥 OVPN       : 1194, 2200, 443
+└─────────────────────
 
 
 🔏 *PUBKEY:*
@@ -84,7 +57,7 @@ https://${d.domain}:81/ssh-${d.username}.txt
 │📅 *Expired:* \`${d.expired}\`
 │🌐 *IP Limit:* \`${d.ip_limit} IP\`
 └─────────────────────
-✨ By : *SAGI MARKET VVIP*! ✨
+✨ By : *EXTRIMER TUNNEL*! ✨
 `.trim();
 
         resolve(msg);

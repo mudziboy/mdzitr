@@ -28,41 +28,21 @@ async function createvless(username, exp, quota, limitip, serverId) {
 
         const d = data.data;
 
-   // Pesan teks
-const messageText = `
-🌟 *AKUN VLESS PREMIUM* 🌟
+        const msg = `
+         🔥 *VLESS PREMIUM ACCOUNT*
 
-┌───☠️───────────────☠️───┐
-│ *Username*  : \`${vlessData.username}\`
-│ *Domain*    : \`${vlessData.domain}\`
-│ *Port TLS*  : \`443\`
-│ *Port HTTP* : \`80\`
-│ *Security*  : \`Auto\`
-│ *Network*   : \`Websocket (WS)\`
-│ *Path*      : \`/vless\`
-│ *Path GRPC* : \`vless-grpc\`
-└─────💀─────☠️────💀────┘
-
-⚙️ *Petunjuk Singkat*
-• Salin credential di atas.
-• Gunakan port & network sesuai informasi.
-• Untuk bantuan atau panduan, klik tombol di bawah ini.
-`;
-
-// Inline button
-const replyMarkup = {
-  inline_keyboard: [
-    [
-      { text: "Hubungi Admin", url: "https://t.me/rahmarie" }
-    ]
-  ]
-};
-
-// Contoh pengiriman pakai node-telegram-bot-api
-bot.sendMessage(chatId, messageText, {
-  parse_mode: "Markdown",
-  reply_markup: replyMarkup
-});
+🔹 *Informasi Akun*
+┌─────────────────────
+│👤 *Username:* \`${d.username}\`
+│🌐 *Domain:* \`${d.domain}\`
+└─────────────────────
+┌─────────────────────
+│🔐 *Port TLS:* \`443\`
+│📡 *Port HTTP:* \`80\`
+│🔁 *Network:* WebSocket
+│📦 *Quota:* ${d.quota === '0 GB' ? 'Unlimited' : d.quota}
+│🌍 *IP Limit:* ${d.ip_limit === '0' ? 'Unlimited' : d.ip_limit}
+└─────────────────────
 
 🔗 *VLESS TLS:*
 \`\`\`
@@ -84,7 +64,7 @@ ${d.vless_grpc_link}
 │
 │📥 [Save Account](https://${d.domain}:81/vless-${d.username}.txt)
 └─────────────────────
-✨ By : *SAGI MARKET VVIP*! ✨
+✨ By : *EXTRIMER TUNNEL*! ✨
 `.trim();
 
         console.log('✅ VLESS created for', username);

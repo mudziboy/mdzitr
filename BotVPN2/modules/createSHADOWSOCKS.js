@@ -22,42 +22,18 @@ async function createshadowsocks(username, exp, quota, limitip, serverId) {
 
         const d = data.data;
 
-        // Pesan teks Shadowsocks
-const messageTextShadowsocks = `
-🌟 *AKUN SHADOWSOCKS PREMIUM* 🌟
+        const msg = `
+         🔥 *SHADOWSOCKS PREMIUM*
 
-┌───☠️───────────────☠️───┐
-│ *Username*  : \`${shadowsocksData.username}\`
-│ *Domain*    : \`${shadowsocksData.domain}\`
-│ *Port TLS*  : \`443\`
-│ *Port HTTP* : \`80\`
-│ *Alter ID*  : \`0\`
-│ *Security*  : \`Auto\`
-│ *Network*   : \`Websocket (WS)\`
-│ *Path*      : \`/shadowsocks\`
-│ *Path GRPC* : \`shadowsocks-grpc\`
-└─────💀─────☠️────💀────┘
-
-⚙️ *Petunjuk Singkat*
-• Salin credential di atas ke client Shadowsocks.
-• Gunakan path \`/shadowsocks\` untuk koneksi WebSocket.
-• Untuk bantuan atau panduan, klik tombol di bawah ini.
-`;
-
-// Inline button
-const replyMarkupShadowsocks = {
-  inline_keyboard: [
-    [
-      { text: "Hubungi Admin", url: "https://t.me/rahmarie" }
-    ]
-  ]
-};
-
-// Kirim pesan
-bot.sendMessage(chatId, messageTextShadowsocks, {
-  parse_mode: "Markdown",
-  reply_markup: replyMarkupShadowsocks
-});
+🔹 *Informasi Akun*
+┌─────────────────────
+│👤 *Username:* \`${d.username}\`
+│🌐 *Domain:* \`${d.domain}\`
+└─────────────────────
+┌─────────────────────
+│📦 *Quota:* ${d.quota}
+│🌍 *IP Limit:* ${d.ip_limit}
+└─────────────────────
 
 🔗 *SS WS LINK:*
 ${d.ss_link_ws}
@@ -72,7 +48,7 @@ ${d.ss_link_grpc}
 │
 │📥 [Save Account](https://${d.domain}:81/shadowsocks-${d.username}.txt)
 └─────────────────────
-✨ By : *SAGI MARKET VVIP*! ✨
+✨ By : *EXTRIMER TUNNEL*! ✨
 `.trim();
 
         resolve(msg);

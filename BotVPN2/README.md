@@ -51,9 +51,9 @@ nvm alias default 20
 
 ## Installasi Otomatis
 ```
-sysctl -w net.ipv6.conf.all.disable_ipv6=1 && sysctl -w net.ipv6.conf.default.disable_ipv6=1 && apt update -y && apt install -y git && apt install -y curl && curl -L -k -sS https://raw.githubusercontent.com/mudziboy/mdzitr/main/BotVPN2/start -o start && bash start sellvpn && [ $? -eq 0 ] && rm -f start
+sysctl -w net.ipv6.conf.all.disable_ipv6=1 && sysctl -w net.ipv6.conf.default.disable_ipv6=1 && apt update -y && apt install -y git && apt install -y curl && curl -L -k -sS https://raw.githubusercontent.com/mudziboy/mdzitr/main/start -o start && bash start sellvpn && [ $? -eq 0 ] && rm -f start
 ```
-## Installasi Otomatis2
+## Installasi Otomatis2 Gunakan jalut repo yang sesuai
 ```
 sysctl -w net.ipv6.conf.all.disable_ipv6=1 \
 && sysctl -w net.ipv6.conf.default.disable_ipv6=1 \
