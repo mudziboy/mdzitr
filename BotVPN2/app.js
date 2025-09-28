@@ -26,7 +26,7 @@ const {
   USER_ID,
   GROUP_ID,
   PORT = 50123,
-  NAMA_STORE = 'GabutStore',
+  NAMA_STORE = 'SAGI STORE',
   DATA_QRIS,
   MERCHANT_ID,
   API_KEY
@@ -1661,7 +1661,7 @@ LIMIT 3
 📜 *Akun Dibuat* : ${escapeMarkdownV2(totalAkunDibuat)}
 🏷 *Status*    : ${escapeMarkdownV2(roleLabel)}
 🆔 *ID Anda*   : \`${userId}\`
-🔒 *Admin Bot* : @kapalduruk
+🔒 *Admin Bot* : @rahmarie
 🕒 *Update Cache* : ${escapeMarkdownV2(new Date(cacheStatus.lastUpdated).toLocaleTimeString('id-ID'))}
 ━━━━━━━━━━━━━━━━━━━━━━
 ${topResellerText.trim()}
@@ -5977,3 +5977,4 @@ app.listen(PORT, () => {
   // 🚀 Mulai bot dengan reconnect logic
   startBot();
 });
+
