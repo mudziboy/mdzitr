@@ -1,154 +1,86 @@
 #!/usr/bin/env bash
 #
-# Auto install latest kernel for TCP BBR
-#
-# System Required:  Debian8+, Ubuntu16+
-#
-# Copyright (C) 2016-2021 Teddysun <i@teddysun.com>
-#
-# URL: https://teddysun.com/489.html
+# Auto Enable TCP BBR (Stable Version)
+# System Required: Debian 9+, Ubuntu 18+
 #
 
-print_color() {
-    local color_code="$1"
-    local message="$2"
-    printf "\033[1;${color_code}m%b\033[0m\n" "$message"
-}
+# Warna untuk output
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+RED='\033[0;31m'
+NC='\033[0m'
 
-_info() {
-    print_color "32" "[Info] $1"
-}
+_info() { printf "${GREEN}[Info]${NC} %s\n" "$1"; }
+_warn() { printf "${YELLOW}[Warning]${NC} %s\n" "$1"; }
+_error() { printf "${RED}[Error]${NC} %s\n" "$1"; exit 1; }
 
-_warn() {
-    print_color "33" "[Warning] $1"
-}
+# Pastikan dijalankan sebagai root
+[[ $EUID -ne 0 ]] && _error "Script ini harus dijalankan sebagai root (sudo)."
 
-_error() {
-    print_color "31" "[Error] $1"
-    exit 1
-}
-
-_exists() {
-    command -v "$1" >/dev/null 2>&1
-}
-
-_os() {
-    [ -f "/etc/os-release" ] && source /etc/os-release && echo "${ID}"
-}
-
-_os_full() {
-    [ -f /etc/os-release ] && awk -F'[= "]' '/PRETTY_NAME/{print $3,$4,$5}' /etc/os-release
-}
-
-_os_ver() {
-    local main_ver="$(echo $(_os_full) | grep -oE "[0-9.]+")"
-    echo "${main_ver%%.*}"
-}
-
-_error_detect() {
-    _info "$1"
-    eval "$1"
-    [ $? -ne 0 ] && _error "Execution command ($1) failed, please check it and try again."
-}
-
-_is_64bit() {
-    [ "$(getconf LONG_BIT)" = "64" ]
-}
-
-_version_ge() {
-    test "$(echo "$@" | tr " " "\n" | sort -rV | head -n 1)" == "$1"
-}
-
-get_latest_version() {
-    latest_version=($(wget -qO- https://kernel.ubuntu.com/~kernel-ppa/mainline/ | awk -F'\"v' '/v[4-9]./{print $2}' | cut -d/ -f1 | grep -v - | sort -V))
-    [ ${#latest_version[@]} -eq 0 ] && _error "Get latest kernel version failed."
-    kernel_arr=()
-    for i in ${latest_version[@]}; do
-        _version_ge $i 5.15 && kernel_arr+=($i)
-    done
-    kernel=${kernel_arr[-1]}
-    if _is_64bit; then
-        deb_name=$(wget -qO- https://kernel.ubuntu.com/~kernel-ppa/mainline/v${kernel}/ | grep "linux-image" | grep "generic" | awk -F'\">' '/amd64.deb/{print $2}' | cut -d'<' -f1 | head -1)
-        deb_kernel_url="https://kernel.ubuntu.com/~kernel-ppa/mainline/v${kernel}/${deb_name}"
-        deb_kernel_name="linux-image-${kernel}-amd64.deb"
-        modules_deb_name=$(wget -qO- https://kernel.ubuntu.com/~kernel-ppa/mainline/v${kernel}/ | grep "linux-modules" | grep "generic" | awk -F'\">' '/amd64.deb/{print $2}' | cut -d'<' -f1 | head -1)
-        deb_kernel_modules_url="https://kernel.ubuntu.com/~kernel-ppa/mainline/v${kernel}/${modules_deb_name}"
-        deb_kernel_modules_name="linux-modules-${kernel}-amd64.deb"
-    else
-        deb_name=$(wget -qO- https://kernel.ubuntu.com/~kernel-ppa/mainline/v${kernel}/ | grep "linux-image" | grep "generic" | awk -F'\">' '/i386.deb/{print $2}' | cut -d'<' -f1 | head -1)
-        deb_kernel_url="https://kernel.ubuntu.com/~kernel-ppa/mainline/v${kernel}/${deb_name}"
-        deb_kernel_name="linux-image-${kernel}-i386.deb"
-        modules_deb_name=$(wget -qO- https://kernel.ubuntu.com/~kernel-ppa/mainline/v${kernel}/ | grep "linux-modules" | grep "generic" | awk -F'\">' '/i386.deb/{print $2}' | cut -d'<' -f1 | head -1)
-        deb_kernel_modules_url="https://kernel.ubuntu.com/~kernel-ppa/mainline/v${kernel}/${modules_deb_name}"
-        deb_kernel_modules_name="linux-modules-${kernel}-i386.deb"
-    fi
-    [ -z "${deb_name}" ] && _error "Getting Linux kernel binary package name failed, maybe kernel build failed. Please choose other one and try again."
-}
-
+# Cek apakah BBR sudah aktif
 check_bbr_status() {
-    [ "$(sysctl net.ipv4.tcp_congestion_control | awk '{print $3}')" == "bbr" ]
+    local status=$(sysctl net.ipv4.tcp_congestion_control | awk '{print $3}')
+    if [ "$status" == "bbr" ]; then
+        return 0
+    else
+        return 1
+    fi
 }
 
+# Cek versi kernel (BBR butuh kernel 4.9+)
 check_kernel_version() {
-    _version_ge "$(uname -r | cut -d- -f1)" 4.9
+    local kernel_ver=$(uname -r | cut -d- -f1)
+    # Membandingkan versi kernel secara numerik
+    if [[ $(echo -e "$kernel_ver\n4.9" | sort -V | head -n1) == "4.9" ]]; then
+        return 0 # Versi mencukupi
+    else
+        return 1 # Versi terlalu tua
+    fi
 }
 
-check_os() {
-    local os=$(_os)
-    [ -z "$os" ] && _error "Not supported OS"
-    case "$os" in
-        ubuntu) [ "$(_os_ver)" -lt 16 ] && _error "Not supported OS, please change to Ubuntu 16+ and try again." ;;
-        debian) [ "$(_os_ver)" -lt 8 ] && _error "Not supported OS, please change to Debian 8+ and try again." ;;
-        *) _error "Not supported OS" ;;
-    esac
-}
-
-sysctl_config() {
+# Konfigurasi sysctl untuk mengaktifkan BBR
+apply_bbr_config() {
+    _info "Mengonfigurasi sysctl untuk BBR..."
+    
+    # Hapus konfigurasi lama jika ada agar tidak double
     sed -i '/net.core.default_qdisc/d' /etc/sysctl.conf
     sed -i '/net.ipv4.tcp_congestion_control/d' /etc/sysctl.conf
+    
+    # Tambahkan konfigurasi baru
     echo "net.core.default_qdisc = fq" >> /etc/sysctl.conf
     echo "net.ipv4.tcp_congestion_control = bbr" >> /etc/sysctl.conf
+    
+    # Terapkan perubahan
     sysctl -p >/dev/null 2>&1
+    
+    if check_bbr_status; then
+        _info "TCP BBR berhasil diaktifkan!"
+    else
+        _error "Gagal mengaktifkan TCP BBR."
+    fi
 }
 
-install_kernel() {
-    case "$(_os)" in
-        ubuntu|debian)
-            _info "Getting latest kernel version..."
-            get_latest_version
-            [ -n "${modules_deb_name}" ] && _error_detect "wget -c -t3 -T60 -O ${deb_kernel_modules_name} ${deb_kernel_modules_url}"
-            _error_detect "wget -c -t3 -T60 -O ${deb_kernel_name} ${deb_kernel_url}"
-            _error_detect "dpkg -i ${deb_kernel_modules_name} ${deb_kernel_name}"
-            rm -f ${deb_kernel_modules_name} ${deb_kernel_name}
-            _error_detect "/usr/sbin/update-grub"
-            ;;
-    esac
-}
-
-
-install_bbr() {
-    check_bbr_status && _info "TCP BBR has already been enabled. nothing to do..."
-    check_kernel_version && _info "The kernel version is greater than 4.9, directly setting TCP BBR..." && sysctl_config && _info "Setting TCP BBR completed..."
-    check_os
-    install_kernel
-    sysctl_config
-}
-
-[[ $EUID -ne 0 ]] && _error "This script must be run as root"
-opsy=$(_os_full)
-arch=$(uname -m)
-lbit=$(getconf LONG_BIT)
-kern=$(uname -r)
-
-echo "---------- System Information ----------"
-echo " OS      : $opsy"
-echo " Arch    : $arch ($lbit Bit)"
-echo " Kernel  : $kern"
+clear
 echo "----------------------------------------"
-echo " Automatically enable TCP BBR script"
-echo
-echo " URL: https://teddysun.com/489.html"
+echo "   TCP BBR Auto Installer (Stable)      "
 echo "----------------------------------------"
-echo
+echo " OS      : $(uname -s)"
+echo " Kernel  : $(uname -r)"
+echo "----------------------------------------"
 
-install_bbr 2>&1 | tee /etc/xray/install_bbr.log
+if check_bbr_status; then
+    _info "TCP BBR sudah aktif di sistem kamu. Tidak ada perubahan yang diperlukan."
+    exit 0
+fi
+
+if check_kernel_version; then
+    _info "Versi kernel memadai ($(uname -r))."
+    apply_bbr_config
+else
+    _warn "Kernel kamu terlalu tua. Mencoba mengupdate sistem..."
+    # Update repository dan coba install kernel terbaru jika di Debian/Ubuntu
+    apt-get update && apt-get install -y --install-recommends linux-generic
+    _info "Silakan REBOOT server kamu dan jalankan script ini lagi."
+fi
+
+echo "----------------------------------------"
